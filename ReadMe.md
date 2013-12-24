@@ -5,13 +5,13 @@
 
 ## What is this thing?
 
-TORevelViewController is my own implementation of a UISplitViewController style view controller that works on both iPhone and iPad, where a 
+TORevealViewController is my own implementation of a UISplitViewController style view controller that works on both iPhone and iPad, where a 
 'detail view controller' (which takes up the whole screen) is displayed by default, but a smaller 'master view controller' can be toggled into
 view at any point.
 I decided to implement this myself over using UISplitViewController as this one lets me configure it for both iPhone and iPad at the same time, and 
 also implements a nicer set of animated gestures.
 
-TORevelViewController supports iOS 5 and above.
+TORevealViewController supports iOS 5 and above.
 
 ## Features
 
