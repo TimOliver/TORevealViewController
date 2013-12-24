@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>3D39D663-B3CB-47E2-BB5D-FEEE49E22F75</string>
+	<key>IDESourceControlProjectName</key>
+	<string>TORevealViewControllerExample</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>8C117B51-9145-4109-A0A9-DCF345D6FEE2</key>
+		<string>https://github.com/TimOliver/TOSlidingSplitViewController.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>TORevealViewControllerExample.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>8C117B51-9145-4109-A0A9-DCF345D6FEE2</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/TimOliver/TOSlidingSplitViewController.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>8C117B51-9145-4109-A0A9-DCF345D6FEE2</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8C117B51-9145-4109-A0A9-DCF345D6FEE2</string>
+			<key>IDESourceControlWCCName</key>
+			<string>TORevealViewController</string>
+		</dict>
+	</array>
+</dict>
+</plist>

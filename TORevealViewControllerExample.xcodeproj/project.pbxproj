@@ -1,0 +1,440 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2207248918545B2E009C96CE /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2207248818545B2E009C96CE /* QuartzCore.framework */; };
+		6C6CEE341855719400533EA4 /* TORevealViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C6CEE331855719400533EA4 /* TORevealViewController.m */; };
+		6C6CEE3D185571A000533EA4 /* TOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C6CEE37185571A000533EA4 /* TOAppDelegate.m */; };
+		6C6CEE3E185571A000533EA4 /* TOViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C6CEE39185571A000533EA4 /* TOViewController.m */; };
+		6C6CEE43185571AE00533EA4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C6CEE40185571AE00533EA4 /* main.m */; };
+		6C6CEE451855722100533EA4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C6CEE35185571A000533EA4 /* Images.xcassets */; };
+		6C8D3B3E1850182800BD799C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C8D3B3D1850182800BD799C /* Foundation.framework */; };
+		6C8D3B401850182800BD799C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C8D3B3F1850182800BD799C /* CoreGraphics.framework */; };
+		6C8D3B421850182800BD799C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C8D3B411850182800BD799C /* UIKit.framework */; };
+		6C8D3B571850182800BD799C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C8D3B561850182800BD799C /* XCTest.framework */; };
+		6C8D3B581850182800BD799C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C8D3B3D1850182800BD799C /* Foundation.framework */; };
+		6C8D3B591850182800BD799C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C8D3B411850182800BD799C /* UIKit.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6C8D3B5A1850182800BD799C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6C8D3B321850182800BD799C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6C8D3B391850182800BD799C;
+			remoteInfo = TOSlidingSplitViewControllerExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		2207248818545B2E009C96CE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		6C6CEE321855719400533EA4 /* TORevealViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TORevealViewController.h; path = TORevealViewController/TORevealViewController.h; sourceTree = SOURCE_ROOT; };
+		6C6CEE331855719400533EA4 /* TORevealViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TORevealViewController.m; path = TORevealViewController/TORevealViewController.m; sourceTree = SOURCE_ROOT; };
+		6C6CEE35185571A000533EA4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = TORevealViewControllerExample/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		6C6CEE36185571A000533EA4 /* TOAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOAppDelegate.h; path = TORevealViewControllerExample/TOAppDelegate.h; sourceTree = SOURCE_ROOT; };
+		6C6CEE37185571A000533EA4 /* TOAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TOAppDelegate.m; path = TORevealViewControllerExample/TOAppDelegate.m; sourceTree = SOURCE_ROOT; };
+		6C6CEE38185571A000533EA4 /* TOViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOViewController.h; path = TORevealViewControllerExample/TOViewController.h; sourceTree = SOURCE_ROOT; };
+		6C6CEE39185571A000533EA4 /* TOViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TOViewController.m; path = TORevealViewControllerExample/TOViewController.m; sourceTree = SOURCE_ROOT; };
+		6C6CEE40185571AE00533EA4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = TORevealViewControllerExample/main.m; sourceTree = SOURCE_ROOT; };
+		6C6CEE41185571AE00533EA4 /* TORevealViewControllerExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "TORevealViewControllerExample-Info.plist"; path = "TORevealViewControllerExample/TORevealViewControllerExample-Info.plist"; sourceTree = SOURCE_ROOT; };
+		6C6CEE42185571AE00533EA4 /* TORevealViewControllerExample-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "TORevealViewControllerExample-Prefix.pch"; path = "TORevealViewControllerExample/TORevealViewControllerExample-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		6C8D3B3A1850182800BD799C /* TORevealViewControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TORevealViewControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6C8D3B3D1850182800BD799C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		6C8D3B3F1850182800BD799C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		6C8D3B411850182800BD799C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		6C8D3B551850182800BD799C /* TORevealViewControllerExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TORevealViewControllerExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6C8D3B561850182800BD799C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6C8D3B371850182800BD799C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2207248918545B2E009C96CE /* QuartzCore.framework in Frameworks */,
+				6C8D3B401850182800BD799C /* CoreGraphics.framework in Frameworks */,
+				6C8D3B421850182800BD799C /* UIKit.framework in Frameworks */,
+				6C8D3B3E1850182800BD799C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6C8D3B521850182800BD799C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6C8D3B571850182800BD799C /* XCTest.framework in Frameworks */,
+				6C8D3B591850182800BD799C /* UIKit.framework in Frameworks */,
+				6C8D3B581850182800BD799C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6C8D3B311850182800BD799C = {
+			isa = PBXGroup;
+			children = (
+				6C8D3B6C18501C3700BD799C /* TORevealViewController */,
+				6C8D3B431850182800BD799C /* TORevealViewControllerExample */,
+				6C8D3B3C1850182800BD799C /* Frameworks */,
+				6C8D3B3B1850182800BD799C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6C8D3B3B1850182800BD799C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6C8D3B3A1850182800BD799C /* TORevealViewControllerExample.app */,
+				6C8D3B551850182800BD799C /* TORevealViewControllerExampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6C8D3B3C1850182800BD799C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2207248818545B2E009C96CE /* QuartzCore.framework */,
+				6C8D3B3D1850182800BD799C /* Foundation.framework */,
+				6C8D3B3F1850182800BD799C /* CoreGraphics.framework */,
+				6C8D3B411850182800BD799C /* UIKit.framework */,
+				6C8D3B561850182800BD799C /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6C8D3B431850182800BD799C /* TORevealViewControllerExample */ = {
+			isa = PBXGroup;
+			children = (
+				6C6CEE35185571A000533EA4 /* Images.xcassets */,
+				6C6CEE36185571A000533EA4 /* TOAppDelegate.h */,
+				6C6CEE37185571A000533EA4 /* TOAppDelegate.m */,
+				6C6CEE38185571A000533EA4 /* TOViewController.h */,
+				6C6CEE39185571A000533EA4 /* TOViewController.m */,
+				6C8D3B441850182800BD799C /* Supporting Files */,
+			);
+			name = TORevealViewControllerExample;
+			path = TOSlidingSplitViewControllerExample;
+			sourceTree = "<group>";
+		};
+		6C8D3B441850182800BD799C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6C6CEE40185571AE00533EA4 /* main.m */,
+				6C6CEE41185571AE00533EA4 /* TORevealViewControllerExample-Info.plist */,
+				6C6CEE42185571AE00533EA4 /* TORevealViewControllerExample-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		6C8D3B6C18501C3700BD799C /* TORevealViewController */ = {
+			isa = PBXGroup;
+			children = (
+				6C6CEE321855719400533EA4 /* TORevealViewController.h */,
+				6C6CEE331855719400533EA4 /* TORevealViewController.m */,
+			);
+			name = TORevealViewController;
+			path = TOSlidingSplitViewControllerExample;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6C8D3B391850182800BD799C /* TORevealViewControllerExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6C8D3B661850182800BD799C /* Build configuration list for PBXNativeTarget "TORevealViewControllerExample" */;
+			buildPhases = (
+				6C8D3B361850182800BD799C /* Sources */,
+				6C8D3B371850182800BD799C /* Frameworks */,
+				6C8D3B381850182800BD799C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TORevealViewControllerExample;
+			productName = TOSlidingSplitViewControllerExample;
+			productReference = 6C8D3B3A1850182800BD799C /* TORevealViewControllerExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6C8D3B541850182800BD799C /* TORevealViewControllerExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6C8D3B691850182800BD799C /* Build configuration list for PBXNativeTarget "TORevealViewControllerExampleTests" */;
+			buildPhases = (
+				6C8D3B511850182800BD799C /* Sources */,
+				6C8D3B521850182800BD799C /* Frameworks */,
+				6C8D3B531850182800BD799C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6C8D3B5B1850182800BD799C /* PBXTargetDependency */,
+			);
+			name = TORevealViewControllerExampleTests;
+			productName = TOSlidingSplitViewControllerExampleTests;
+			productReference = 6C8D3B551850182800BD799C /* TORevealViewControllerExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6C8D3B321850182800BD799C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = TO;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Timothy Oliver";
+				TargetAttributes = {
+					6C8D3B541850182800BD799C = {
+						TestTargetID = 6C8D3B391850182800BD799C;
+					};
+				};
+			};
+			buildConfigurationList = 6C8D3B351850182800BD799C /* Build configuration list for PBXProject "TORevealViewControllerExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 6C8D3B311850182800BD799C;
+			productRefGroup = 6C8D3B3B1850182800BD799C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6C8D3B391850182800BD799C /* TORevealViewControllerExample */,
+				6C8D3B541850182800BD799C /* TORevealViewControllerExampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6C8D3B381850182800BD799C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6C6CEE451855722100533EA4 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6C8D3B531850182800BD799C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6C8D3B361850182800BD799C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6C6CEE341855719400533EA4 /* TORevealViewController.m in Sources */,
+				6C6CEE3D185571A000533EA4 /* TOAppDelegate.m in Sources */,
+				6C6CEE43185571AE00533EA4 /* main.m in Sources */,
+				6C6CEE3E185571A000533EA4 /* TOViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6C8D3B511850182800BD799C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6C8D3B5B1850182800BD799C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6C8D3B391850182800BD799C /* TORevealViewControllerExample */;
+			targetProxy = 6C8D3B5A1850182800BD799C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		6C8D3B641850182800BD799C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6C8D3B651850182800BD799C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6C8D3B671850182800BD799C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TORevealViewControllerExample/TORevealViewControllerExample-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/TORevealViewControllerExample/TORevealViewControllerExample-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				PRODUCT_NAME = TORevealViewControllerExample;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		6C8D3B681850182800BD799C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TORevealViewControllerExample/TORevealViewControllerExample-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/TORevealViewControllerExample/TORevealViewControllerExample-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				PRODUCT_NAME = TORevealViewControllerExample;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		6C8D3B6A1850182800BD799C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TORevealViewControllerExample.app/TORevealViewControllerExample";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TOSlidingSplitViewControllerExample/TOSlidingSplitViewControllerExample-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "TOSlidingSplitViewControllerExampleTests/TOSlidingSplitViewControllerExampleTests-Info.plist";
+				PRODUCT_NAME = TORevealViewControllerExampleTests;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		6C8D3B6B1850182800BD799C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TORevealViewControllerExample.app/TORevealViewControllerExample";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TOSlidingSplitViewControllerExample/TOSlidingSplitViewControllerExample-Prefix.pch";
+				INFOPLIST_FILE = "TOSlidingSplitViewControllerExampleTests/TOSlidingSplitViewControllerExampleTests-Info.plist";
+				PRODUCT_NAME = TORevealViewControllerExampleTests;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6C8D3B351850182800BD799C /* Build configuration list for PBXProject "TORevealViewControllerExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6C8D3B641850182800BD799C /* Debug */,
+				6C8D3B651850182800BD799C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6C8D3B661850182800BD799C /* Build configuration list for PBXNativeTarget "TORevealViewControllerExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6C8D3B671850182800BD799C /* Debug */,
+				6C8D3B681850182800BD799C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6C8D3B691850182800BD799C /* Build configuration list for PBXNativeTarget "TORevealViewControllerExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6C8D3B6A1850182800BD799C /* Debug */,
+				6C8D3B6B1850182800BD799C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6C8D3B321850182800BD799C /* Project object */;
+}
