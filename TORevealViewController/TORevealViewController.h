@@ -1,7 +1,7 @@
 //
 //  TORevealViewController.h
 //
-//  Copyright 2013 Timothy Oliver. All rights reserved.
+//  Copyright 2014 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -50,6 +50,9 @@
 
 /* An overriding vertical offset for the front view controller */
 @property (nonatomic, assign) CGFloat frontViewControllerVerticalOffset;
+
+/* A convienience method for seeing if the front view controller is visible. */
+@property (nonatomic, readonly) BOOL frontViewControllerIsVisible;
 
 /* Create a new instance of the reveal view controller with the foreground and background view controllers */
 - (instancetype)initWithFrontViewController:(UIViewController *)frontViewController rearViewController:(UIViewController *)rearViewController;

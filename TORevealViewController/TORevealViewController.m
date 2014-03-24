@@ -1,7 +1,7 @@
 //
 //  TORevealViewController.m
 //
-//  Copyright 2013 Timothy Oliver. All rights reserved.
+//  Copyright 2014 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -20,7 +20,7 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#define REVEAL_VIEW_CONTROLLER_DEFAULT_front_SIZE CGSizeMake(320.0f, self.view.bounds.size.height)
+#define REVEAL_VIEW_CONTROLLER_DEFAULT_FRONT_SIZE CGSizeMake(320.0f, self.view.bounds.size.height)
 
 #ifndef NSFoundationVersionNumber_iOS_6_1
 #define NSFoundationVersionNumber_iOS_6_1 993.00
@@ -30,6 +30,9 @@
 #import "TORevealViewController.h"
 
 @interface TORevealViewController () <UIGestureRecognizerDelegate>
+
+/* The current extent that the front view controller is visible (0.0 to 1.0) */
+@property (nonatomic, assign) CGFloat frontControllerOffsetRatio;
 
 /* Gesture Recognizer to handle any panning gestures to display the front view controller */
 @property (nonatomic, strong) UIPanGestureRecognizer *panGestureRecognizer;
@@ -58,7 +61,7 @@
 - (void)setup;
 
 /* Work out the frame of the front view controller, given current state. */
-- (CGRect)frameForFrontViewController;
+- (CGRect)frameForFrontViewControllerHidden:(BOOL)hidden;
 
 /* Reset the transform and lay out the rear view controller */
 - (void)layoutRearViewController;
@@ -71,8 +74,11 @@
 - (void)setUpFrontViewController;
 - (void)setUpRearViewController;
 
-/* Triggered when we need to re-draw content on-screen */
-- (void)updateDisplayContent;
+/* Triggered when an animation redraws to the screen */
+- (void)updateDisplayLinkContent;
+
+/* Used to layout all content as they currently should be */
+- (void)layoutContent;
 
 /* Start observing the v-sync refresh of the screen (so we can redraw any content as needed) */
 - (void)startObservingVSyncRefresh;
@@ -82,6 +88,9 @@
 - (void)showFrontViewControllerButtonTapped:(id)sender;
 - (void)hideFrontViewControllerButtonTapped:(id)sender;
 
+/* Reset the navigation bars on any UINavigationController children. */
+- (void)resetNavigationControllerChildren;
+
 @end
 
 @implementation TORevealViewController
@@ -89,9 +98,7 @@
 - (instancetype)init
 {
     if (self = [super init])
-    {
         [self setup];
-    }
     
     return self;
 }
@@ -99,9 +106,7 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
-    {
         [self setup];
-    }
     
     return self;
 }
@@ -109,9 +114,7 @@
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     if (self = [super initWithCoder:aDecoder])
-    {
         [self setup];
-    }
     
     return self;
 }
@@ -131,6 +134,13 @@
 {
     _shrinkRearViewControllerAnimation = YES;
     _canPresentWithGesture = YES;
+}
+
+- (void)loadView
+{
+    self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+    self.view.opaque = YES;
+    self.view.backgroundColor = [UIColor blackColor];
 }
 
 - (void)viewDidLoad
@@ -166,7 +176,7 @@
     CGRect frame = self.frontViewController.view.frame;
     BOOL isHidden = CGRectGetMinX(frame) < 0.0f - FLT_EPSILON;
     
-    frame = [self frameForFrontViewController];
+    frame = [self frameForFrontViewControllerHidden:isHidden];
     if (isHidden == NO)
         frame.origin.x = 0.0f;
     
@@ -175,7 +185,7 @@
 
 #pragma mark -
 #pragma mark Setting up
-- (CGRect)frameForFrontViewController
+- (CGRect)frameForFrontViewControllerHidden:(BOOL)hidden
 {
     CGRect frame = CGRectZero;
     
@@ -194,12 +204,12 @@
     }
     
     //set the size
-    if (self.frontViewControllerContentSize.width > 0.0f)
+    if (self.frontViewControllerContentSize.width > 0.0f + FLT_EPSILON)
         frame.size = self.frontViewControllerContentSize;
     else if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)])
         frame.size = [targetViewController contentSizeForRevealViewController];
     else
-        frame.size = REVEAL_VIEW_CONTROLLER_DEFAULT_front_SIZE;
+        frame.size = REVEAL_VIEW_CONTROLLER_DEFAULT_FRONT_SIZE;
     
     //make sure the size isn't bigger than the view space
     frame.size.height = MIN(CGRectGetHeight(frame), CGRectGetHeight(self.view.bounds));
@@ -213,20 +223,26 @@
         frame.origin.y = 0.0f;
     
     //hidden by default (But can be overridden by the calling method)
-    frame.origin.x = -(CGRectGetWidth(frame));
-    
+    if (hidden) {
+        frame.origin.x = -(CGRectGetWidth(frame));
+        self.frontControllerOffsetRatio = 0.0f;
+    }
+    else {
+        self.frontControllerOffsetRatio = 1.0f;
+        frame.origin.x = 0.0f;
+    }
+        
     return frame;
 }
 
 - (void)layoutRearViewController
 {
-    if (self.shrinkRearViewControllerAnimation)
-    {
-        self.rearViewController.view.layer.transform = CATransform3DScale(CATransform3DIdentity, 1.0f, 1.0f, 1.0f); //transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.0f, 1.0f);
+    if (self.shrinkRearViewControllerAnimation) {
+        self.rearViewController.view.layer.transform = CATransform3DScale(CATransform3DIdentity, 1.0f, 1.0f, 1.0f);
         self.rearViewController.view.frame = self.view.bounds;
     }
-        
-    [self updateDisplayContent];
+    
+    [self layoutContent];
 }
 
 - (void)setUpFrontViewController
@@ -238,7 +254,7 @@
     [self addChildViewController:self.frontViewController];
     
     //set up the view size
-    CGRect frame = [self frameForFrontViewController];
+    CGRect frame = [self frameForFrontViewControllerHidden:YES];
     
     self.frontViewController.view.frame = frame;
     self.frontViewController.view.hidden = YES;
@@ -275,7 +291,7 @@
     self.rearViewController.view.frame = self.view.bounds;
     
     //add to the main view
-    [self.view insertSubview:self.rearViewController.view atIndex:0];
+        [self.view insertSubview:self.rearViewController.view atIndex:0];
     
     //re-position the black overlay
     if (self.blackOverlayView)
@@ -305,42 +321,39 @@
     if (self.displayLink)
         return;
     
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateDisplayContent)];
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateDisplayLinkContent)];
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)stopObservingVSyncRefresh
-{
+{   
     [self.displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
     [self.displayLink invalidate];
     self.displayLink = nil;
 }
 
-- (void)updateDisplayContent
+- (void)updateDisplayLinkContent
 {
     //Work out where the front view controller is positioned, even if it's in the middle of an animation sequence
     CGRect frame = [(CALayer *)self.frontViewController.view.layer.presentationLayer frame];
-   
+    if (frame.size.width < 0.0f + FLT_EPSILON)
+        return;
+    
     //Work out as a percentage, at what completion state of the animation it's at
     CGFloat completionRatio = 1.0f - (frame.origin.x / (-frame.size.width));
     completionRatio = MIN(completionRatio, 1.0f);
     completionRatio = MAX(completionRatio, 0.0f);
     
-    //change the sizing of the rear layer's transform
-    CGFloat scale = 0.1f;
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-        scale = 0.04f;
+    self.frontControllerOffsetRatio = completionRatio;
     
-    if (self.shrinkRearViewControllerAnimation)
-    {
-        CGFloat transformScale = 1.0f - (scale * completionRatio);
-        self.rearViewController.view.layer.transform = CATransform3DScale(CATransform3DIdentity, transformScale, transformScale, transformScale);
-        
-        if (completionRatio >= 0.0f + FLT_EPSILON)
-            self.rearViewController.view.layer.shouldRasterize = YES;
-        else
-            self.rearViewController.view.layer.shouldRasterize = NO;
-    }
+    [self layoutContent];
+}
+
+- (void)layoutContent
+{
+    CGFloat completionRatio = self.frontControllerOffsetRatio;
+    
+    CGSize frontControllerSize = self.frontViewController.view.frame.size;
     
     if (self.statusBarUnderlayView)
         self.statusBarUnderlayView.alpha = completionRatio;
@@ -349,21 +362,67 @@
     self.blackOverlayView.alpha = MIN(completionRatio * 0.55f, 0.55f);
     
     //if the front view controller is completely off-screen, hide it
-    if (CGRectIntersectsRect(frame, self.view.bounds) == NO)
+    if (self.frontControllerOffsetRatio <= 0.0f + FLT_EPSILON)
         self.frontViewController.view.hidden = YES;
     else
         self.frontViewController.view.hidden = NO;
     
     //if the front view controller has completeley obscured the rear view controller, hide it
-    if (frame.origin.x >= 0.0f - FLT_EPSILON && CGSizeEqualToSize(frame.size, self.view.bounds.size))
+    if (CGSizeEqualToSize(frontControllerSize, self.view.bounds.size) && completionRatio >= 1.0f - FLT_EPSILON)
     {
-        self.rearViewController.view.hidden = YES;
-        self.blackOverlayView.hidden = YES;
+        [self.rearViewController.view removeFromSuperview];
+        [self.blackOverlayView removeFromSuperview];
     }
     else
     {
-        self.rearViewController.view.hidden = NO;
-        self.blackOverlayView.hidden = NO;
+        if (self.rearViewController.view.superview == nil) {
+            //reset the transform and the size of the view before inserting it in, or else iOS 7 UINavigationControllers
+            //will ignore the status bar
+            self.rearViewController.view.layer.transform = CATransform3DScale(CATransform3DIdentity, 1.0f, 1.0f, 1.0f);
+            self.rearViewController.view.frame = self.view.bounds;
+            [self.view insertSubview:self.rearViewController.view atIndex:0];
+            
+            [self.view insertSubview:self.blackOverlayView aboveSubview:self.rearViewController.view];
+            self.blackOverlayView.frame = self.view.bounds;
+            
+            [self resetNavigationControllerChildren];
+        }
+    }
+    
+    //change the sizing of the rear layer's transform
+    if (self.shrinkRearViewControllerAnimation) {
+        
+        CGFloat scale = 0.15f;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            scale = 0.06f;
+        
+        CGFloat transformScale = 1.0f - (scale * completionRatio);
+        self.rearViewController.view.layer.transform = CATransform3DScale(CATransform3DIdentity, transformScale, transformScale, transformScale);
+    }
+}
+
+- (void)resetNavigationControllerChildren
+{
+    if ([self.frontViewController isKindOfClass:[UINavigationController class]])
+    {
+        //force the navigation bar to reset itself by hiding and re-showing it
+        UINavigationController *navController = (UINavigationController *)self.frontViewController;
+        if (navController.navigationBarHidden == NO)
+        {
+            [navController setNavigationBarHidden:YES animated:NO];
+            [navController setNavigationBarHidden:NO animated:NO];
+        }
+    }
+    
+    if ([self.rearViewController isKindOfClass:[UINavigationController class]])
+    {
+        //force the navigation bar to reset itself by hiding and re-showing it
+        UINavigationController *navController = (UINavigationController *)self.rearViewController;
+        if (navController.navigationBarHidden == NO)
+        {
+            [navController setNavigationBarHidden:YES animated:NO];
+            [navController setNavigationBarHidden:NO animated:NO];
+        }
     }
 }
 
@@ -371,15 +430,19 @@
 {
     CGRect frame = self.frontViewController.view.frame;
     
-    if (hidden)
+    if (hidden) {
         frame.origin.x = -(CGRectGetWidth(frame));
-    else
+        self.frontControllerOffsetRatio = 0.0f;
+    }
+    else {
         frame.origin.x = 0.0f;
-    
+        self.frontControllerOffsetRatio = 1.0f;
+    }
+        
     if (animated == NO)
     {
         self.frontViewController.view.frame = frame;
-        [self updateDisplayContent];
+        [self layoutContent];
     }
     else
     {
@@ -395,8 +458,8 @@
         CABasicAnimation *panAnimation = [CABasicAnimation animationWithKeyPath:@"position"];
         panAnimation.fromValue = [NSValue valueWithCGPoint:translatedFromPoint];
         panAnimation.toValue = [NSValue valueWithCGPoint:translatedToPoint];
-        panAnimation.duration = 0.45f;
-        panAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:0.20f :0.52f :0.37f :1.0f];
+        panAnimation.duration = 0.35f;
+        panAnimation.timingFunction = [CAMediaTimingFunction functionWithControlPoints:0.35f :0.91f :0.56f :1.0f];
         panAnimation.delegate = self;
         [self.frontViewController.view.layer addAnimation:panAnimation forKey:@"position"];
         self.frontViewController.view.frame = frame;
@@ -410,7 +473,13 @@
     if (flag == NO)
         return;
     
+    //stop observing the frame refresh link
     [self stopObservingVSyncRefresh];
+    
+    //lock in one more poll of the completion ratio
+    CGRect frame = self.frontViewController.view.frame;
+    self.frontControllerOffsetRatio = 1.0f - (frame.origin.x / (-frame.size.width));
+    [self layoutContent];
 }
 
 #pragma mark -
@@ -419,17 +488,22 @@
 {
     if (gestureRecognizer == self.panGestureRecognizer && self.canPresentWithGesture)
     {
-        //only recognize the pan if it's horizontal
         CGPoint translation = [self.panGestureRecognizer translationInView:self.view];
-        if (fabs(translation.y) < fabs(translation.x))
-            return YES;
-        
-        //if the front view controller is fully hidden, only enable if we pan to the right
         CGRect frame = self.frontViewController.view.frame;
-        if (CGRectGetMinX(frame) <= -(CGRectGetWidth(frame) + FLT_EPSILON) && translation.x > 0.0f + FLT_EPSILON)
-            return YES;
+        
+        // if the front view is hidden, only activate if travelling to the right
+        if (CGRectGetMinX(frame) <= -(CGRectGetWidth(frame) + FLT_EPSILON))
+        {
+            if (translation.x > 0.0f + FLT_EPSILON && fabs(translation.y) < fabs(translation.x))
+                return YES;
+        }
+        //only recognize the pan if it's horizontal
+        else {
+            if (fabs(translation.y) < fabs(translation.x))
+                return YES;
+        }
     }
-    else if (gestureRecognizer == self.tapGestureRecognizer)
+    else if (self.frontViewControllerIsVisible && gestureRecognizer == self.tapGestureRecognizer)
     {
         CGRect frame = [(CALayer *)self.frontViewController.view.layer.presentationLayer frame];
         
@@ -470,10 +544,14 @@
     frame.origin.x = MAX(frame.origin.x, -frame.size.width);
     frame.origin.x = MIN(frame.origin.x, 0.0f);
     
+    //save the offset as a ratio for manual updates later
     self.frontViewController.view.frame = frame;
     
+    //save the current position as a ratio
+    self.frontControllerOffsetRatio = 1.0f - (frame.origin.x / (-frame.size.width));
+    
     //update the rear view controller's display
-    [self updateDisplayContent];
+    [self layoutContent];
     
     //if the gesture is ending, see if we need to animate out the rest
     if (panGestureRecognizer.state == UIGestureRecognizerStateEnded)
@@ -518,37 +596,35 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    CGRect frame = self.frontViewController.view.frame;
-    BOOL hidden = CGRectGetMinX(frame) < 0.0f - FLT_EPSILON;
+    //inform all of the children view controllers that we're going to rotate
+    for (UIViewController *childController in self.childViewControllers)
+        [childController willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
     
-    frame = [self frameForFrontViewController];
-    
-    if (hidden == NO)
-        frame.origin.x = 0.0f;
-    
+    //set the new frame for the front view controller based on the new orientation
+    CGRect frame = [self frameForFrontViewControllerHidden:!self.frontViewControllerIsVisible];
     self.frontViewController.view.frame = frame;
     
-    if (CGRectIntersectsRect(frame, self.view.bounds))
+    //reset the size of the rear view controller
+    if (self.rearViewController.view.superview)
         [self layoutRearViewController];
-    
-    [self updateDisplayContent];
+
+    //layout all of the content
+    [self layoutContent];
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-    //dumb bug in iOS 6. If the front view controller is a navigation controller and is hidden while we rotate, the navigation bar doesn't update itself properly
-    if ([self.frontViewController isKindOfClass:[UINavigationController class]])
-    {
-        //force the navigation bar to reset itself by hiding and re-showing it
-        UINavigationController *navController = (UINavigationController *)self.frontViewController;
-        if (navController.navigationBarHidden == NO)
-        {
-            [navController setNavigationBarHidden:YES animated:NO];
-            [navController setNavigationBarHidden:NO animated:NO];
-        }
+    //reset the frame of the front view controller
+    if (self.frontViewControllerIsVisible) {
+        self.frontViewController.view.frame = [self frameForFrontViewControllerHidden:NO];
     }
     
-    [self updateDisplayContent];
+    //inform all of the children view controllers that we've rotated
+    for (UIViewController *childController in self.childViewControllers)
+        [childController didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+    
+    //layout the content
+    [self layoutContent];
 }
 
 #pragma mark -
@@ -597,8 +673,8 @@
     //assign the new one
     _rearViewController = rearViewController;
     
-    //set the rasterization scale to match the screen
-    _rearViewController.view.layer.rasterizationScale = [[UIScreen mainScreen] scale];
+    //set the rasterization scale
+    _rearViewController.view.layer.rasterizationScale = [UIScreen mainScreen].scale;
     
     //set it up
     [self setUpRearViewController];
@@ -639,6 +715,11 @@
     }
 }
 
+- (BOOL)frontViewControllerIsVisible
+{
+    return (self.frontControllerOffsetRatio >= 1.0f - FLT_EPSILON);
+}
+
 @end
 
 /*******************************************************************/
@@ -665,13 +746,23 @@
 - (CGSize)contentSizeForRevealViewController
 {
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-    {
         return CGSizeMake(320.0f, self.view.bounds.size.height);
-    }
-    else
-    {
-        return self.view.bounds.size;
-    }
+    
+    return self.view.bounds.size;
+}
+
+- (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView
+{
+    UIViewController *frontViewController = self.revealViewController.frontViewController;
+    UIViewController *rearViewController = self.revealViewController.rearViewController;
+    
+    if (self == frontViewController && !self.revealViewController.frontViewControllerIsVisible)
+        return NO;
+    
+    if (self == rearViewController && self.revealViewController.frontViewControllerIsVisible)
+        return NO;
+    
+    return YES;
 }
 
 @end
