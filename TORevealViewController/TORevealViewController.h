@@ -45,6 +45,9 @@
 /* Bar button item that will hide the front view controller */
 @property (nonatomic, strong, readonly) UIBarButtonItem *hideFrontViewControllerButtonItem;
 
+/* Optional value for setting how much the rear view controller is darkened when the front controller is presented. */
+@property (nonatomic, assign) CGFloat rearContentDarkOpacity;
+
 /* An overriding content size for the front view controller */
 @property (nonatomic, assign) CGSize frontViewControllerContentSize;
 
@@ -60,6 +63,9 @@
 /* Show the foreground view controller */
 - (void)setFrontViewControllerHidden:(BOOL)hidden animated:(BOOL)animated;
 
+/* Show the foreground controller with a completion handler */
+- (void)setFrontViewControllerHidden:(BOOL)hidden animated:(BOOL)animated completionHandler:(void (^)(void))completionHandler;
+
 @end
 
 /* Optional methods the front view controller can implement to affect the placement of front view controller */
@@ -73,5 +79,8 @@
 
 /* Override the sizing of the foreground view controller */
 - (CGSize)contentSizeForRevealViewController;
+
+/* Notified the front view controller when it's shown/hidden */
+- (void)revealViewControllerWillSetHidden:(BOOL)hidden;
 
 @end
