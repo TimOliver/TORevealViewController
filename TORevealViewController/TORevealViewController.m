@@ -20,12 +20,8 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#define REVEAL_VIEW_CONTROLLER_DEFAULT_FRONT_SIZE CGSizeMake(320.0f, self.view.bounds.size.height)
+#define REVEAL_VIEW_CONTROLLER_DEFAULT_FRONT_SIZE CGSizeMake(375.0f, self.view.bounds.size.height)
 #define REVEAL_VIEW_CONTROLLER_NEW_ROTATIONS ([[UIViewController class] respondsToSelector:@selector(viewWillTransitionToSize:withTransitionCoordinator:)])
-
-#ifndef NSFoundationVersionNumber_iOS_6_1
-#define NSFoundationVersionNumber_iOS_6_1 993.00
-#endif
 
 #import <QuartzCore/QuartzCore.h>
 #import "TORevealViewController.h"
@@ -50,91 +46,38 @@
 /* Tracks when the view is hidden/removed from a superview (So we can disable the transform) */
 @property (nonatomic, assign) BOOL viewIsHiddenOrRemoved;
 
-/* Perform common setup steps across all init methods */
-- (void)setup;
-
-/* Work out the frame of the front view controller, given current state. */
-- (CGRect)frameForFrontViewControllerHidden:(BOOL)hidden;
-
-/* Reset the transform and lay out the rear view controller */
-- (void)resetRearViewController;
-
-/* Feedback methods for recognized gesture recognizers */
-- (void)panGestureRecognized:(UIPanGestureRecognizer *)panGestureRecognizer;
-- (void)tapGestureRecognized:(UITapGestureRecognizer *)tapGestureRecognizer;
-
-/* Whether done on init, or down the track, these methods set up the two child view controllers */
-- (void)setUpFrontViewController;
-- (void)setUpRearViewController;
-
-/* When appearing for the first time, or resuming, reset the bounds of all content */
-- (void)resetLayout;
-
-/* Used to layout all content as they currently should be */
-- (void)layoutContent;
-- (void)updateViewsWithCompletionRatio:(CGFloat)ratio;
-
-/* Start observing the v-sync refresh of the screen (so we can redraw any content as needed) */
-- (void)startObservingVSyncRefresh;
-- (void)stopObservingVSyncRefresh;
-
-/* Triggered when an animation redraws to the screen */
-- (void)updateDisplayLinkContent;
-
-/* Callback for when the visiblity state of the front view controller is toggled. */
-- (void)showFrontViewControllerButtonTapped:(id)sender;
-- (void)hideFrontViewControllerButtonTapped:(id)sender;
-
-/* Reset the navigation bars on any UINavigationController children. */
-- (void)resetNavigationControllerChildren;
-
-/* Set the front view controller visible or hidden. */
-- (void)setFrontViewControllerHidden:(BOOL)hidden animated:(BOOL)animated fromVelocity:(CGFloat)velocity completionHandler:(void (^)(void))completionHandler;
-
 @end
 
 @implementation TORevealViewController
 
-- (instancetype)init
+static inline TORevealViewController *init(TORevealViewController *self)
 {
-    if (self = [super init])
-        [self setup];
-    
+    self.shrinkRearViewControllerAnimation = YES;
+    self.canPresentWithGesture = YES;
+    self.rearContentDarkOpacity = 0.55f;
     return self;
 }
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
-        [self setup];
-    
-    return self;
+- (instancetype)init {
+    return init([super init]);
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder
-{
-    if (self = [super initWithCoder:aDecoder])
-        [self setup];
-    
-    return self;
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    return init([super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]);
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    return init([super initWithCoder:aDecoder]);
 }
 
 - (instancetype)initWithFrontViewController:(UIViewController *)frontViewController rearViewController:(UIViewController *)rearViewController
 {
-    if (self = [self init])
-    {
+    if ((self = init([super init]))) {
         _frontViewController = frontViewController;
         _rearViewController = rearViewController;
     }
     
     return self;
-}
-
-- (void)setup
-{
-    _shrinkRearViewControllerAnimation = YES;
-    _canPresentWithGesture = YES;
-    _rearContentDarkOpacity = 0.55f;
 }
 
 - (void)loadView
@@ -199,6 +142,17 @@
     [self.rearViewController viewDidAppear:animated];
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+    self.viewIsHiddenOrRemoved = YES;
+    
+    [super viewWillDisappear:animated];
+    [self resetLayout];
+    
+    [self.frontViewController viewWillDisappear:animated];
+    [self.rearViewController viewWillDisappear:animated];
+}
+
 - (void)viewDidDisappear:(BOOL)animated
 {
     self.viewIsHiddenOrRemoved = YES;
@@ -218,12 +172,9 @@
     
     //See if the front view controller, or any of its children implement the size method
     UIViewController *targetViewController = self.frontViewController;
-    if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)] == NO)
-    {
-        for (UIViewController *childController in targetViewController.childViewControllers)
-        {
-            if ([childController respondsToSelector:@selector(contentSizeForRevealViewController)])
-            {
+    if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)] == NO) {
+        for (UIViewController *childController in targetViewController.childViewControllers) {
+            if ([childController respondsToSelector:@selector(contentSizeForRevealViewController)]) {
                 targetViewController = childController;
                 break;
             }
@@ -231,29 +182,36 @@
     }
     
     if (targetViewController == nil) {
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-            frame.size = CGSizeMake(320.0f, self.view.bounds.size.height);
-        else
+        if (self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular) {
+            frame.size = CGSizeMake(375.0f, self.view.bounds.size.height);
+        }
+        else {
             frame.size = self.view.bounds.size;
+        }
     }
     
     //set the size
-    if (self.frontViewControllerContentSize.width > 0.0f + FLT_EPSILON)
+    if (self.frontViewControllerContentSize.width > 0.0f + FLT_EPSILON) {
         frame.size = self.frontViewControllerContentSize;
-    else if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)])
+    }
+    else if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)]) {
         frame.size = [targetViewController contentSizeForRevealViewController];
+    }
     
     //make sure the size isn't bigger than the view space
     frame.size.height = MIN(CGRectGetHeight(frame), CGRectGetHeight(self.view.bounds));
     
     //set the vertical co-ordinates
-    if (self.frontViewControllerVerticalOffset > 0.0f)
+    if (self.frontViewControllerVerticalOffset > 0.0f) {
         self.verticalOffset = self.frontViewControllerVerticalOffset;
-    else if ([targetViewController respondsToSelector:@selector(verticalOffsetForRevealViewController)])
+    }
+    else if ([targetViewController respondsToSelector:@selector(verticalOffsetForRevealViewController)]) {
         self.verticalOffset = [targetViewController verticalOffsetForRevealViewController];
-    else
+    }
+    else {
         self.verticalOffset = 0.0f;
-    
+    }
+        
     frame.origin.y = self.verticalOffset;
     
     //hidden by default (But can be overridden by the calling method)
@@ -271,8 +229,9 @@
 
 - (void)resetRearViewController
 {
-    if (self.shrinkRearViewControllerAnimation == NO)
+    if (self.shrinkRearViewControllerAnimation == NO) {
         return;
+    }
     
     self.rearViewController.view.transform = CGAffineTransformIdentity;
     self.rearViewController.view.frame = self.view.bounds;
@@ -280,9 +239,10 @@
 
 - (void)setUpFrontViewController
 {
-    if (self.frontViewController == nil)
+    if (self.frontViewController == nil) {
         return;
-    
+    }
+        
     //add the new one to the hierarchy
     [self addChildViewController:self.frontViewController];
     
@@ -297,19 +257,6 @@
     
     [self.frontContainerView addSubview:self.frontViewController.view];
     [self.view addSubview:self.frontContainerView];
-    
-    // if we're iOS 6 or below, round the edges
-    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1)
-    {
-        UIView *frontView = self.frontViewController.view;
-        
-        frontView.layer.masksToBounds = YES;
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-            frontView.layer.cornerRadius = 5.0f;
-        else
-            frontView.layer.cornerRadius = 2.0f;
-    }
     
     if (self.statusBarUnderlayView)
         [self.view bringSubviewToFront:self.statusBarUnderlayView];
