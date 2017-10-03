@@ -139,9 +139,8 @@
 
 - (void)loadView
 {
-    self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+    self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.view.opaque = YES;
-    self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.view.backgroundColor = [UIColor blackColor];
 }
 
@@ -758,7 +757,7 @@
     return [self.rearViewController shouldAutorotate];
 }
 
-- (NSUInteger)supportedInterfaceOrientations
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     return [self.rearViewController supportedInterfaceOrientations];
 }
