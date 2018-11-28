@@ -47,6 +47,8 @@
 @property (nonatomic, strong) UIView *blackOverlayView; /* Dark overlay shown beneath the front controller when visible. */
 @property (nonatomic, strong) UIView *statusBarUnderlayView; /* Optionally shown under the status bar when the front controller appears. */
 
+@property (nonatomic, assign) BOOL viewIsHiddenOrRemoved; /* State tracking for when the view is taken offscreen */
+
 @end
 
 @implementation TORevealViewController
