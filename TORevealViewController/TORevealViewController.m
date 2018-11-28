@@ -1,7 +1,7 @@
 //
 //  TORevealViewController.m
 //
-//  Copyright 2014 Timothy Oliver. All rights reserved.
+//  Copyright 2014-2018 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -23,6 +23,10 @@
 #define REVEAL_VIEW_CONTROLLER_DEFAULT_FRONT_SIZE CGSizeMake(375.0f, self.view.bounds.size.height)
 #define REVEAL_VIEW_CONTROLLER_NEW_ROTATIONS ([[UIViewController class] respondsToSelector:@selector(viewWillTransitionToSize:withTransitionCoordinator:)])
 
+#ifndef NSFoundationVersionNumber_iOS_6_1
+#define NSFoundationVersionNumber_iOS_6_1 993.00
+#endif
+
 #import <QuartzCore/QuartzCore.h>
 #import "TORevealViewController.h"
 
@@ -43,36 +47,38 @@
 @property (nonatomic, strong) UIView *blackOverlayView; /* Dark overlay shown beneath the front controller when visible. */
 @property (nonatomic, strong) UIView *statusBarUnderlayView; /* Optionally shown under the status bar when the front controller appears. */
 
-/* Tracks when the view is hidden/removed from a superview (So we can disable the transform) */
-@property (nonatomic, assign) BOOL viewIsHiddenOrRemoved;
-
 @end
 
 @implementation TORevealViewController
 
-static inline TORevealViewController *init(TORevealViewController *self)
+- (instancetype)init
 {
-    self.shrinkRearViewControllerAnimation = YES;
-    self.canPresentWithGesture = YES;
-    self.rearContentDarkOpacity = 0.55f;
+    if (self = [super init])
+        [self setup];
+    
     return self;
 }
 
-- (instancetype)init {
-    return init([super init]);
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
+        [self setup];
+    
+    return self;
 }
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    return init([super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]);
-}
-
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
-    return init([super initWithCoder:aDecoder]);
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    if (self = [super initWithCoder:aDecoder])
+        [self setup];
+    
+    return self;
 }
 
 - (instancetype)initWithFrontViewController:(UIViewController *)frontViewController rearViewController:(UIViewController *)rearViewController
 {
-    if ((self = init([super init]))) {
+    if (self = [self init])
+    {
         _frontViewController = frontViewController;
         _rearViewController = rearViewController;
     }
@@ -80,11 +86,20 @@ static inline TORevealViewController *init(TORevealViewController *self)
     return self;
 }
 
+- (void)setup
+{
+    _shrinkRearViewControllerAnimation = YES;
+    _canPresentWithGesture = YES;
+    _rearContentDarkOpacity = 0.55f;
+    _showShadowUnderFrontViewController = YES;
+}
+
 - (void)loadView
 {
     self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    self.view.opaque = YES;
-    self.view.backgroundColor = [UIColor blackColor];
+    self.view.opaque = NO;
+    self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.view.backgroundColor = [UIColor clearColor];
 }
 
 - (void)viewDidLoad
@@ -142,17 +157,6 @@ static inline TORevealViewController *init(TORevealViewController *self)
     [self.rearViewController viewDidAppear:animated];
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    self.viewIsHiddenOrRemoved = YES;
-    
-    [super viewWillDisappear:animated];
-    [self resetLayout];
-    
-    [self.frontViewController viewWillDisappear:animated];
-    [self.rearViewController viewWillDisappear:animated];
-}
-
 - (void)viewDidDisappear:(BOOL)animated
 {
     self.viewIsHiddenOrRemoved = YES;
@@ -172,9 +176,12 @@ static inline TORevealViewController *init(TORevealViewController *self)
     
     //See if the front view controller, or any of its children implement the size method
     UIViewController *targetViewController = self.frontViewController;
-    if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)] == NO) {
-        for (UIViewController *childController in targetViewController.childViewControllers) {
-            if ([childController respondsToSelector:@selector(contentSizeForRevealViewController)]) {
+    if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)] == NO)
+    {
+        for (UIViewController *childController in targetViewController.childViewControllers)
+        {
+            if ([childController respondsToSelector:@selector(contentSizeForRevealViewController)])
+            {
                 targetViewController = childController;
                 break;
             }
@@ -182,36 +189,29 @@ static inline TORevealViewController *init(TORevealViewController *self)
     }
     
     if (targetViewController == nil) {
-        if (self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular) {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
             frame.size = CGSizeMake(375.0f, self.view.bounds.size.height);
-        }
-        else {
+        else
             frame.size = self.view.bounds.size;
-        }
     }
     
     //set the size
-    if (self.frontViewControllerContentSize.width > 0.0f + FLT_EPSILON) {
+    if (self.frontViewControllerContentSize.width > 0.0f + FLT_EPSILON)
         frame.size = self.frontViewControllerContentSize;
-    }
-    else if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)]) {
+    else if ([targetViewController respondsToSelector:@selector(contentSizeForRevealViewController)])
         frame.size = [targetViewController contentSizeForRevealViewController];
-    }
     
     //make sure the size isn't bigger than the view space
     frame.size.height = MIN(CGRectGetHeight(frame), CGRectGetHeight(self.view.bounds));
     
     //set the vertical co-ordinates
-    if (self.frontViewControllerVerticalOffset > 0.0f) {
+    if (self.frontViewControllerVerticalOffset > 0.0f)
         self.verticalOffset = self.frontViewControllerVerticalOffset;
-    }
-    else if ([targetViewController respondsToSelector:@selector(verticalOffsetForRevealViewController)]) {
+    else if ([targetViewController respondsToSelector:@selector(verticalOffsetForRevealViewController)])
         self.verticalOffset = [targetViewController verticalOffsetForRevealViewController];
-    }
-    else {
+    else
         self.verticalOffset = 0.0f;
-    }
-        
+    
     frame.origin.y = self.verticalOffset;
     
     //hidden by default (But can be overridden by the calling method)
@@ -229,9 +229,8 @@ static inline TORevealViewController *init(TORevealViewController *self)
 
 - (void)resetRearViewController
 {
-    if (self.shrinkRearViewControllerAnimation == NO) {
+    if (self.shrinkRearViewControllerAnimation == NO)
         return;
-    }
     
     self.rearViewController.view.transform = CGAffineTransformIdentity;
     self.rearViewController.view.frame = self.view.bounds;
@@ -239,10 +238,9 @@ static inline TORevealViewController *init(TORevealViewController *self)
 
 - (void)setUpFrontViewController
 {
-    if (self.frontViewController == nil) {
+    if (self.frontViewController == nil)
         return;
-    }
-        
+    
     //add the new one to the hierarchy
     [self addChildViewController:self.frontViewController];
     
@@ -258,14 +256,29 @@ static inline TORevealViewController *init(TORevealViewController *self)
     [self.frontContainerView addSubview:self.frontViewController.view];
     [self.view addSubview:self.frontContainerView];
     
+    // if we're iOS 6 or below, round the edges
+    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1)
+    {
+        UIView *frontView = self.frontViewController.view;
+        
+        frontView.layer.masksToBounds = YES;
+        
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            frontView.layer.cornerRadius = 5.0f;
+        else
+            frontView.layer.cornerRadius = 2.0f;
+    }
+    
     if (self.statusBarUnderlayView)
         [self.view bringSubviewToFront:self.statusBarUnderlayView];
     
     //add a shadow
-    /*self.frontViewController.view.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.frontViewController.view.layer.shadowOpacity  = 0.0f;
-    self.frontViewController.view.layer.shadowRadius = 5.0f;
-    self.frontViewController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.frontViewController.view.bounds].CGPath;*/
+    if (self.showShadowUnderFrontViewController) {
+        self.frontViewController.view.layer.shadowColor = [UIColor blackColor].CGColor;
+        self.frontViewController.view.layer.shadowOpacity  = 0.0f;
+        self.frontViewController.view.layer.shadowRadius = 10.0f;
+        self.frontViewController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.frontViewController.view.bounds].CGPath;
+    }
 }
 
 - (void)setUpRearViewController
@@ -289,6 +302,14 @@ static inline TORevealViewController *init(TORevealViewController *self)
     //bring the overlay view to the front
     if (self.statusBarUnderlayView)
         [self.view bringSubviewToFront:self.statusBarUnderlayView];
+}
+
+- (void)cancelAllAnimations
+{
+    [self.frontContainerView.layer removeAllAnimations];
+    [self.statusBarUnderlayView.layer removeAllAnimations];
+    [self.rearViewController.view.layer removeAllAnimations];
+    [self.blackOverlayView.layer removeAllAnimations];
 }
 
 #pragma mark -
@@ -392,9 +413,11 @@ static inline TORevealViewController *init(TORevealViewController *self)
         
         self.frontContainerView.autoresizingMask = UIViewAutoresizingNone;
     }
-    
-    //self.frontViewController.view.layer.shadowOpacity = completionRatio;
-    
+
+    if (self.showShadowUnderFrontViewController) {
+        self.frontViewController.view.layer.shadowOpacity = completionRatio;
+    }
+
     [self updateViewsWithCompletionRatio:completionRatio];
 }
 
@@ -524,23 +547,22 @@ static inline TORevealViewController *init(TORevealViewController *self)
         translatedToPoint.x = MAX(-frame.size.width, translatedToPoint.x);
         
         CGFloat delta = fabs(translatedFromPoint.x - translatedToPoint.x);
-        if (velocity > FLT_EPSILON && delta > 1.0f + FLT_EPSILON)
+        if (velocity > FLT_EPSILON && delta > 1.0f + FLT_EPSILON) {
             velocity /= delta;
-        else
+        }
+        else {
             velocity = 1.0f;
-        
-        velocity = MIN(velocity,30.0f);
+        }
+
+        velocity = MIN(velocity, 30.0f);
         
         //NSLog(@"From: %f To: %f Velocity: %f", translatedFromPoint.x, translatedToPoint.x, velocity);
-        [self.frontContainerView.layer removeAllAnimations];
-        [self.blackOverlayView.layer removeAllAnimations];
-        [self.rearViewController.view.layer removeAllAnimations];
-        [self.statusBarUnderlayView.layer removeAllAnimations];
+        [self cancelAllAnimations];
         
         CGFloat ratio = delta / frame.size.width;
         self.frontContainerView.hidden = NO;
         self.rearViewController.view.hidden = NO;
-        [self updateViewsWithCompletionRatio:hidden?ratio : 1.0f - ratio];
+        [self updateViewsWithCompletionRatio:hidden ? ratio : 1.0f - ratio];
         
         self.frontContainerView.frame = (CGRect){translatedFromPoint, self.frontContainerView.frame.size};
         [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:velocity options:UIViewAnimationOptionAllowUserInteraction animations:^{
@@ -554,9 +576,6 @@ static inline TORevealViewController *init(TORevealViewController *self)
                 
                 return;
             }
-            
-            //stop observing the frame refresh link
-            //[self stopObservingVSyncRefresh];
             
             //lock in one more poll of the completion ratio
             CGRect frame = self.frontContainerView.frame;
@@ -572,8 +591,17 @@ static inline TORevealViewController *init(TORevealViewController *self)
             if (completionHandler)
                 completionHandler();
         }];
-        
-        //[self startObservingVSyncRefresh];
+
+        // Animate the shadow opacity
+        if (self.showShadowUnderFrontViewController) {
+            CALayer *layer = self.frontViewController.view.layer;
+            CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
+            anim.fromValue = [NSNumber numberWithFloat:layer.shadowOpacity];
+            anim.toValue = [NSNumber numberWithFloat:hidden ? 0.0f : 1.0f];
+            anim.duration = 0.5;
+            [layer addAnimation:anim forKey:@"shadowOpacity"];
+            layer.shadowOpacity = [(NSNumber *)anim.toValue floatValue];
+        }
     }
 }
 
@@ -587,7 +615,7 @@ static inline TORevealViewController *init(TORevealViewController *self)
         CGRect frame = self.frontContainerView.frame;
         
         // if the front view is hidden, only activate if travelling to the right
-        if (CGRectGetMinX(frame) <= -(CGRectGetWidth(frame) + FLT_EPSILON))
+        if (CGRectGetMinX(frame) <= -(CGRectGetWidth(frame) - FLT_EPSILON))
         {
             if (translation.x > 0.0f + FLT_EPSILON && fabs(translation.y) < fabs(translation.x))
                 return YES;
@@ -627,6 +655,8 @@ static inline TORevealViewController *init(TORevealViewController *self)
     //so to work this out, we need to save the original position of the front view controller when we started
     if (panGestureRecognizer.state == UIGestureRecognizerStateBegan)
     {
+        [self cancelAllAnimations];
+        
         //if we swiped mid-animation, cancel the animation and set the new origin to the frame canceled at
         if ([self.frontContainerView.layer animationForKey:@"position"])
         {
@@ -704,7 +734,7 @@ static inline TORevealViewController *init(TORevealViewController *self)
     return [self.rearViewController shouldAutorotate];
 }
 
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+- (NSUInteger)supportedInterfaceOrientations
 {
     return [self.rearViewController supportedInterfaceOrientations];
 }
@@ -779,7 +809,7 @@ static inline TORevealViewController *init(TORevealViewController *self)
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         //set the new frame for the front view controller based on the new orientation
         self.frontContainerView.frame = [self frameForFrontViewControllerHidden:!self.frontViewControllerIsVisible];
-        //self.frontViewController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.frontViewController.view.bounds].CGPath;
+        self.frontViewController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.frontViewController.view.bounds].CGPath;
         
         //reset the size of the rear view controller
         if (self.rearViewController.view.superview)
