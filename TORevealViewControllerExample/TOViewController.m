@@ -41,9 +41,4 @@
     [self.view addSubview:self.titleLabel];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
-{
-    return YES;
-}
-
 @end
