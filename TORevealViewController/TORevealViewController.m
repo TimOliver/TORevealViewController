@@ -373,10 +373,15 @@
     });
     
     [self resetRearViewController];
-    [self layoutContent];
+    [self layoutContentForSize:self.view.bounds.size];
 }
 
 - (void)layoutContent
+{
+    [self layoutContentForSize:self.view.bounds.size];
+}
+
+- (void)layoutContentForSize:(CGSize)size
 {
     CGFloat completionRatio = self.frontControllerOffsetRatio;
     CGSize frontControllerSize = self.frontContainerView.frame.size;
@@ -394,7 +399,7 @@
     }
     
     //if the front view controller has completeley obscured the rear view controller, hide it
-    if (CGSizeEqualToSize(frontControllerSize, self.view.bounds.size) && completionRatio >= 1.0f - FLT_EPSILON) {
+    if (CGSizeEqualToSize(frontControllerSize, size) && completionRatio >= 1.0f - FLT_EPSILON) {
         if (self.rearViewController.view.hidden == NO) {
             self.rearViewController.view.hidden = YES;
             
@@ -405,7 +410,7 @@
             self.frontContainerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         }
     }
-    else if (completionRatio >= 1.0f - FLT_EPSILON && !CGSizeEqualToSize(frontControllerSize, self.view.bounds.size)) {
+    else if (completionRatio >= 1.0f - FLT_EPSILON && !CGSizeEqualToSize(frontControllerSize, size)) {
         self.frontContainerView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     }
     else {
@@ -744,18 +749,19 @@
         self.frontViewController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.frontViewController.view.bounds].CGPath;
         
         //reset the size of the rear view controller
-        if (self.rearViewController.view.superview)
+        if (self.rearViewController.view.superview) {
             [self resetRearViewController];
+        }
         
         //layout all of the content
-        [self layoutContent];
+        [self layoutContentForSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         //reset the frame of the front view controller
         if (self.frontViewControllerIsVisible)
             self.frontContainerView.frame = [self frameForFrontViewControllerHidden:NO];
         
         //layout the content
-        [self layoutContent];
+        [self layoutContentForSize:size];
     }];
 }
 
@@ -861,7 +867,12 @@
 
 - (CGSize)contentSizeForRevealViewController
 {
-    return CGSizeMake(375.0f, 1024.0f);
+    if (self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular) {
+        return CGSizeMake(375.0f, 1024.0f);
+    }
+    else {
+        return self.view.bounds.size;
+    }
 }
 
 - (TORevealViewController *)revealViewController
