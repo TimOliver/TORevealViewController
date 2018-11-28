@@ -21,7 +21,6 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define REVEAL_VIEW_CONTROLLER_DEFAULT_FRONT_SIZE CGSizeMake(375.0f, self.view.bounds.size.height)
-#define REVEAL_VIEW_CONTROLLER_NEW_ROTATIONS ([[UIViewController class] respondsToSelector:@selector(viewWillTransitionToSize:withTransitionCoordinator:)])
 
 #ifndef NSFoundationVersionNumber_iOS_6_1
 #define NSFoundationVersionNumber_iOS_6_1 993.00
@@ -721,29 +720,9 @@
 
 #pragma mark -
 #pragma mark Screen Rotation Handling
-- (BOOL)automaticallyForwardAppearanceAndRotationMethodsToChildViewControllers
-{
-    return NO;
-}
-
-- (BOOL)shouldAutomaticallyForwardRotationMethods
-{
-    return NO;
-}
-
 - (BOOL)shouldAutorotate
 {
     return [self.rearViewController shouldAutorotate];
-}
-
-- (NSUInteger)supportedInterfaceOrientations
-{
-    return [self.rearViewController supportedInterfaceOrientations];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
-{
-    return [self.rearViewController shouldAutorotateToInterfaceOrientation:toInterfaceOrientation];
 }
 
 - (void)viewWillLayoutSubviews
@@ -753,55 +732,6 @@
         CGRect frame = [self frameForFrontViewControllerHidden:!self.frontViewControllerIsVisible];
         self.frontContainerView.frame = frame;
     }
-}
-
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-    if (REVEAL_VIEW_CONTROLLER_NEW_ROTATIONS)
-        return;
-    
-    //inform all of the children view controllers that we're going to rotate
-    for (UIViewController *childController in self.childViewControllers)
-        [childController willRotateToInterfaceOrientation:toInterfaceOrientation duration:duration];
-}
-
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-    if (REVEAL_VIEW_CONTROLLER_NEW_ROTATIONS)
-        return;
-    
-    //inform all of the children view controllers that we're going to rotate
-    for (UIViewController *childController in self.childViewControllers)
-        [childController willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
-    
-    //set the new frame for the front view controller based on the new orientation
-    CGRect frame = [self frameForFrontViewControllerHidden:!self.frontViewControllerIsVisible];
-    self.frontContainerView.frame = frame;
-    
-    //reset the size of the rear view controller
-    if (self.rearViewController.view.superview)
-        [self resetRearViewController];
-    
-    //layout all of the content
-    [self layoutContent];
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    if (REVEAL_VIEW_CONTROLLER_NEW_ROTATIONS)
-        return;
-    
-    //reset the frame of the front view controller
-    if (self.frontViewControllerIsVisible) {
-        self.frontViewController.view.frame = [self frameForFrontViewControllerHidden:NO];
-    }
-    
-    //inform all of the children view controllers that we've rotated
-    for (UIViewController *childController in self.childViewControllers)
-        [childController didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-    
-    //layout the content
-    [self layoutContent];
 }
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
@@ -928,6 +858,11 @@
 /*******************************************************************/
 
 @implementation UIViewController (TORevealViewController)
+
+- (CGSize)contentSizeForRevealViewController
+{
+    return CGSizeMake(375.0f, 1024.0f);
+}
 
 - (TORevealViewController *)revealViewController
 {
